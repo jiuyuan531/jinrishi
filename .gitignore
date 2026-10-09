@@ -1,0 +1,17 @@
+# 平台目录由 CI 中的 flutter create 生成
+/android/
+/windows/
+/ios/
+/linux/
+/macos/
+/web/
+.dart_tool/
+.packages
+build/
+dist/
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock
+*.iml
+.idea/
+tool/ChineseSimplified.isl
