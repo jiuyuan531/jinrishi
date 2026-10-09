@@ -13,7 +13,7 @@ pat = re.compile(r"(error|Error|ERROR|What went wrong|FAILURE|Exception|e: |\.da
 keep = []
 for i, line in enumerate(lines):
     if pat.search(line):
-        keep.extend(lines[max(0, i - 1): i + 3])
+        keep.extend(lines[max(0, i - 1): i + (12 if 'went wrong' in line or 'AAR metadata' in line else 3)])
 seen = set()
 out = []
 for l in keep:

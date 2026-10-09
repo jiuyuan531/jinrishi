@@ -24,7 +24,8 @@ def patch_android() -> None:
     # 1. 原生文件
     kdir = app / "src" / "main" / "kotlin" / PKG.replace(".", "/")
     kdir.mkdir(parents=True, exist_ok=True)
-    shutil.copy(src / "kotlin" / "TodayWidgetProvider.kt", kdir / "TodayWidgetProvider.kt")
+    for f in (src / "kotlin").iterdir():
+        shutil.copy(f, kdir / f.name)
     for sub in ("layout", "xml", "drawable"):
         dst = app / "src" / "main" / "res" / sub
         dst.mkdir(parents=True, exist_ok=True)
@@ -135,6 +136,20 @@ def patch_windows() -> None:
     # 由 Dart 端决定是否显示窗口（开机自启时只进托盘）
     t = must_replace(t, "this->Show();", "// this->Show();  // 由 window_manager 控制", "Show()")
     fw.write_text(t, encoding="utf-8")
+
+    # 新版 Visual Studio 拒绝 flutter_local_notifications_windows 用到的旧协程头文件
+    cm = ROOT / "windows" / "CMakeLists.txt"
+    t = cm.read_text(encoding="utf-8")
+    if "_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS" not in t:
+        t = re.sub(
+            r"(project\([^\n]*\)\n)",
+            r"\1add_compile_definitions(_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)\n",
+            t,
+            count=1,
+        )
+        if "_SILENCE_EXPERIMENTAL" not in t:
+            sys.exit("[patch] 找不到 windows/CMakeLists.txt 的 project() 行")
+        cm.write_text(t, encoding="utf-8")
 
     main = ROOT / "windows" / "runner" / "main.cpp"
     t = main.read_text(encoding="utf-8")
