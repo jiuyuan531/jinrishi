@@ -88,8 +88,6 @@ jobs:
         run: dart run flutter_launcher_icons -f tool/icons_windows.yaml
       - name: 编译 exe
         shell: bash
-        env:
-          CL: /D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS
         run: |
           set -o pipefail
           flutter build windows --release 2>&1 | tee build.log
